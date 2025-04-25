@@ -1,0 +1,10 @@
+{
+    "name": "Snapshot",
+    "version": "1.0.0",
+    "author": "Sanjeev Krishna",
+    "uuid": "7d276bc8-e6cc-4e28-94b5-021c320854b7",
+    "tags": [
+        "Pre-Migration",
+        "CommandRunner"
+    ]
+}
