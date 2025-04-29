@@ -1,4 +1,6 @@
 import logging
+logger = logging.getLogger(__name__)
+
 import os
 from PyQt5 import QtWidgets, QtGui, QtCore
 from .workers import RunEvent
@@ -134,7 +136,7 @@ class Form(QtWidgets.QWidget, Ui_Form):
         self.run_button.clicked.connect(self.run_start_event)
         self.folder_button.clicked.connect(lambda: self.open_path(self.output_dir))
 
-        logging.debug("Form initialized with output_dir: %s", self.output_dir)
+        logger.debug("Form initialized with output_dir: %s", self.output_dir)
 
     def run_start_event(self):
         """
@@ -150,7 +152,7 @@ class Form(QtWidgets.QWidget, Ui_Form):
         self.run_worker.add_progress.connect(self.update_progress)
         self.run_worker.finished.connect(self.run_finish_event)
 
-        logging.info("Worker thread started")
+        logger.info("Worker thread started")
 
     def run_finish_event(self):
         """
@@ -161,7 +163,7 @@ class Form(QtWidgets.QWidget, Ui_Form):
 
         QtWidgets.QMessageBox.information(self, "Info", "Task completed!!")
 
-        logging.info("Worker task completed and UI updated")
+        logger.info("Worker task completed and UI updated")
 
     def update_progress(self, value):
         """
@@ -173,7 +175,7 @@ class Form(QtWidgets.QWidget, Ui_Form):
         new_value = self.progress_bar.value() + int(value)
         self.progress_bar.setValue(new_value)
 
-        logging.debug("Progress bar updated: %d", new_value)
+        logger.debug("Progress bar updated: %d", new_value)
 
     def open_path(self, path: str):
         """
@@ -184,9 +186,9 @@ class Form(QtWidgets.QWidget, Ui_Form):
         """
         try:
             if path and os.path.exists(path):
-                logging.info(f"Opening path: {path}")
+                logger.info(f"Opening path: {path}")
                 QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(path))
             else:
-                logging.error(f"Invalid or non-existent path: {path}")
+                logger.error(f"Invalid or non-existent path: {path}")
         except Exception as e:
-            logging.exception(f"Failed to open path: {e}")
+            logger.exception(f"Failed to open path: {e}")
