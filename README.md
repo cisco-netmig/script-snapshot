@@ -21,3 +21,6 @@
 
 ## Tags  
 `#NetworkLogging` `#Netmig` `#Automation` `#NetworkMigration` `#Diagnostics` `#Cisco` `#Infrastructure` `#DeviceLogs` `#ShowCommands` `#PreMigration` `#PostMigration`
+
+## Screenshots
+![Project Logo](./SCREENSHOT.png)
