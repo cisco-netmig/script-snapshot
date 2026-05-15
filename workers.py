@@ -1,5 +1,7 @@
-import os
 import logging
+logger = logging.getLogger(__name__)
+
+import os
 from concurrent.futures import ThreadPoolExecutor
 from time import sleep
 from datetime import datetime
@@ -38,13 +40,13 @@ class RunEvent(QtCore.QThread):
         self.commands = list(filter(None, self.form.commands_text_edit.toPlainText().splitlines()))
         self.output_type = self.form.type_combo_box.currentText()
 
-        logging.info("[MAIN] ScriptExecution >> Starting...")
+        logger.info("[MAIN] ScriptExecution >> Starting...")
 
         self.output_data = {}
         self.thread_executor()
         self.generate_report()
 
-        logging.info("[MAIN] ScriptExecution >> Finished")
+        logger.info("[MAIN] ScriptExecution >> Finished")
         self.add_progress.emit(2)
 
     def thread_executor(self):
@@ -65,7 +67,7 @@ class RunEvent(QtCore.QThread):
             for device, future in futures.items():
                 exception = future.exception()
                 if exception:
-                    logging.error("Exception for %s: %s", device, exception)
+                    logger.error("Exception for %s: %s", device, exception)
 
     def snapshot_task(self, device):
         """
@@ -82,7 +84,7 @@ class RunEvent(QtCore.QThread):
             "command_output": {}
         }
 
-        logging.info("Connecting to %s...", device)
+        logger.info("Connecting to %s...", device)
         self.add_progress.emit(available_progress * 0.1)
 
         proxy = None
@@ -101,18 +103,18 @@ class RunEvent(QtCore.QThread):
             handler="NETMIKO"
         )
 
-        logging.info("Connection established to %s", device)
+        logger.info("Connection established to %s", device)
         self.output_data[device]["prompt"] = handler.prompt
         self.add_progress.emit(available_progress * 0.2)
 
         command_progress = (available_progress * 0.7) / len(self.commands)
         for command in self.commands:
-            logging.info("Capturing '%s' output for %s", command, device)
+            logger.info("Capturing '%s' output for %s", command, device)
             result = handler.sendCommand(command).strip()
             self.output_data[device]["command_output"][command] = result
             self.add_progress.emit(command_progress)
-            if hasattr(logging, "savings"):
-                logging.savings(10)
+            if hasattr(logger, "savings"):
+                logger.savings(10)
 
         handler.close()
 
@@ -123,7 +125,7 @@ class RunEvent(QtCore.QThread):
         from netcore import XLBW
 
         if self.output_type == "Text":
-            logging.info("Writing output to text files...")
+            logger.info("Writing output to text files...")
             for device, data in self.output_data.items():
                 prompt = data["prompt"]
                 filename = f"{prompt[:-1]}_{datetime.now().strftime('%Y-%m-%d')}.txt"
@@ -134,7 +136,7 @@ class RunEvent(QtCore.QThread):
                         file.write(f"{prompt}{command}\n{output}\n{'-' * 79}\n")
 
         else:
-            logging.info("Writing output to Excel...")
+            logger.info("Writing output to Excel...")
             dump_data = {}
             for idx, (device, data) in enumerate(self.output_data.items(), start=1):
                 dump_data[idx] = {"Device": data["prompt"][:-1]}
@@ -149,4 +151,4 @@ class RunEvent(QtCore.QThread):
             workbook.dump(dump_data, worksheet)
             workbook.close()
 
-            logging.info("Excel report saved: %s", filepath)
+            logger.info("Excel report saved: %s", filepath)
